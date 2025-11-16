@@ -15,6 +15,13 @@ public protocol APIEndpointType {
     var path: String { get }
     var method: HTTPMethod { get }
     var headers : [HTTPHeader] { get }
-    var params : HTTPParamRequestBody? { get }
+    var parameter : HTTPParameter? { get }
+    var configurations : [APIConfiguration] { get }
     
+}
+
+
+public enum APIConfiguration {
+    case cachePolicy(URLRequest.CachePolicy)
+    case timeoutInterval(TimeInterval)
 }

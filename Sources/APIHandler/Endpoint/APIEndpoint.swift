@@ -14,7 +14,8 @@ public struct APIEndpoint : APIEndpointType{
     public let path: String
     public let method: HTTPMethod
     public let headers : [HTTPHeader]
-    public let params: HTTPParamRequestBody?
+    public let parameter: HTTPParameter?
+    public let configurations: [APIConfiguration]
     
     
     public init(
@@ -23,14 +24,16 @@ public struct APIEndpoint : APIEndpointType{
         path: String,
         method: HTTPMethod,
         headers: [HTTPHeader],
-        params: HTTPParamRequestBody?
+        parameter: HTTPParameter?,
+        configurations: [APIConfiguration] = []
     ) {
         self.baseURL = baseURL
         self.versionURL = versionURL
         self.path = path
         self.method = method
         self.headers = headers
-        self.params = params
+        self.parameter = parameter
+        self.configurations = configurations
     }
     
 }

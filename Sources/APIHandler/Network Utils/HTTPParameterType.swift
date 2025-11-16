@@ -8,28 +8,24 @@
 import Foundation
 
 
-public protocol HTTPParameterType {
-    var body : Data? { get set }
-}
-
-public struct HTTPParameter : HTTPParameterType {
+public struct HTTPParameter {
     
     public var body : Data?
     
-    private var jsonBody : JsonRequestBodyType?
+    private var jsonBody : Encodable?
     private var multipartBody : MultiPartRequestBodyType?
     
     
-    public init (body : Data?) {
+    public init?(body : Data?) {
         self.body = body
     }
     
-    init?(body : JsonRequestBodyType) {
+    public init?(body : Encodable) {
         self.jsonBody = body
     }
     
-    init?(multipartBody : MultiPartRequestBodyType) {
-        self.multipartBody = multipartBody
+    public init?(body : MultiPartRequestBodyType) {
+        self.multipartBody = body
     }
     
     public func buildBody() -> Data? {
@@ -38,12 +34,12 @@ public struct HTTPParameter : HTTPParameterType {
             return dataBody
         }
         
-        if let encodedBody = try? JSONEncoder().encode(body) {
+        if let jsonBody, let encodedBody = try? JSONEncoder().encode(jsonBody) {
             return encodedBody
         }
         
         if let multipartBody = self.multipartBody {
-            return self.multipartBody?.buildMultiPartBodyBuilder().build()
+            return multipartBody.buildMultiPartBodyBuilder().build()
         }
         
         return nil
@@ -51,12 +47,7 @@ public struct HTTPParameter : HTTPParameterType {
     
 }
 
-public protocol JsonRequestBodyType: Encodable, HTTPParameterType {
-    func toJson() -> StringAnyDict
-}
-
-
-public protocol MultiPartRequestBodyType: Encodable, HTTPParameterType {
+public protocol MultiPartRequestBodyType: Encodable {
     var boundary: String { get }
     func buildMultiPartBodyBuilder() -> MultipartFormDataBodyBuilder
 }

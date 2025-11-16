@@ -19,7 +19,7 @@ public class MultipartFormDataBodyBuilder {
     let boundary: String
     let entries: [MultipartFormDataEntry]
     
-    init(
+    public init(
         boundary: String,
         entries: [MultipartFormDataEntry]) {
         self.boundary = boundary

@@ -30,10 +30,7 @@ public extension HTTPHeaderFieldValue {
 
 public extension HTTPHeader {
     
-    func getHeadersForMultipart(paramBody : HTTPParameterType) -> Self {
-        guard let paramBody = paramBody as? MultiPartRequestBodyType else {
-            return Self(field: .contentType, value: .applicationJson)
-        }
+    static func getHeadersForMultipart(paramBody : MultiPartRequestBodyType) -> Self {
         return Self(
             field: .contentType,
             value: HTTPHeaderFieldValue("multipart/form-data; boundary=\(paramBody.boundary)")
