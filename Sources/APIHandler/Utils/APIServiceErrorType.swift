@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol APIServiceErrorType : Error, LocalizedError, NameLoggable{
+public protocol APIServiceErrorType : Error, LocalizedError, NameLoggable{
     func log()
 }
 
-extension APIServiceErrorType {
+public extension APIServiceErrorType {
     func log() {
         print("[\(className)] : \(errorDescription ?? "No error description"), Recovery Suggestion: \(recoverySuggestion ?? "No recovery suggestion")")
     }

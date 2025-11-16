@@ -1,6 +1,6 @@
 //
 //  HTTPHeader.swift
-//  iOSModule
+//  APIService
 //
 //  Created by Suraj kahar on 10/02/25.
 //
@@ -28,7 +28,7 @@ public struct HTTPHeader{
     public let field: HTTPHeaderFieldName
     public let value: HTTPHeaderFieldValue
 
-    init(
+    public init(
         field: HTTPHeaderFieldName,
         value: HTTPHeaderFieldValue
     ) {

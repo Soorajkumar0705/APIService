@@ -1,20 +1,20 @@
 //
 //  NameLoggable.swift
-//  iOSModule
+//  APIService
 //
 //  Created by Suraj kahar on 28/02/25.
 //
 
 import Foundation
 
-protocol NameLoggable {
+public protocol NameLoggable {
     
     var className: String { get }
     static var className : String { get }
     
 }
 
-extension NameLoggable {
+public extension NameLoggable {
     
     var className: String {
         String(describing: type(of: self))

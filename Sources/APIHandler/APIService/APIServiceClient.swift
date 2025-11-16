@@ -1,6 +1,6 @@
 //
-//  APIService.swift
-//  iOSModule
+//  APIServiceClient.swift
+//  APIService
 //
 //  Created by Suraj kahar on 09/09/24.
 //
@@ -8,30 +8,48 @@
 import Foundation
 
 
-//MARK: - APIService
+//MARK: - APIServiceClient
 
-public class APIService : NSObject, APIServiceProtocol{
+public class APIServiceClient : NSObject, APIServiceClientType{
     
-    var networkHandler: NetworkHandlerType
-    var responseHandler: ResponseHandlerType
+    public var networkHandler: NetworkHandlerType
+    public var responseHandler: ResponseHandlerType
     
+    weak public var delegate: APIServiceDelegate?
+
     
-    public init(networkHandler : NetworkHandlerType,
-         responseHandler : ResponseHandlerType
+    var authenticationHeader: [HTTPHeader]?
+    var customHandlingStatusCode : [Int]?
+    
+    init(
+        networkHandler : NetworkHandlerType,
+        responseHandler : ResponseHandlerType,
+        delegate : APIServiceDelegate?,
+        authenticationHeader : [HTTPHeader]? = nil,
+        customHandlingStatusCode : [Int]? = nil
     ){
         self.networkHandler = networkHandler
         self.responseHandler = responseHandler
+        
+        super.init()
+        
+        self.delegate = delegate
+        self.authenticationHeader = authenticationHeader
+        self.customHandlingStatusCode = customHandlingStatusCode
+        
     }
     
     public func getData< S : Codable >(
         endpoint : APIEndpointEnumType,
-        useCustomParser : Bool = false,
         successResponseModelType : S.Type
         
     ) async throws -> S {
         
         do{
             let networkResult = try await networkHandler.requestDataAPI(endpoint: endpoint.getEndpoint())
+            
+            
+            
             
             return try responseHandler.parseResponseWithJSONDecoder(data: networkResult, modelType: successResponseModelType)
 

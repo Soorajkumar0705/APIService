@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct CodableHelper {
+public struct CodableHelper {
     
-    static func encodeData<T:Codable>(data : T) -> Data?{
+    public static func encodeData<T:Codable>(data : T) -> Data?{
         do{
             return try JSONEncoder().encode(data)
         }catch let error{
@@ -18,7 +18,7 @@ struct CodableHelper {
         return nil
     }
     
-    static func decodeData<T: Codable>(type : T.Type, data: Data) -> T?{
+    public static func decodeData<T: Codable>(type : T.Type, data: Data) -> T?{
         do{
             return try JSONDecoder().decode(T.self, from: data)
         }catch let error{
@@ -29,7 +29,7 @@ struct CodableHelper {
     
 }
 
-extension String{
+public extension String{
     
     func toJSON() -> StringAnyDict{
         guard let jsonData = self.data(using: .utf8) else{
@@ -47,7 +47,7 @@ extension String{
     
 }
 
-extension Data{
+public extension Data{
     
     func toJSON() -> StringAnyDict?{
         do {
