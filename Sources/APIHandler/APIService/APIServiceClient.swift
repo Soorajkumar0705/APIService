@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import NetworkReachability
 
 
 //MARK: - APIServiceClient
@@ -37,6 +38,7 @@ public class APIServiceClient : NSObject, APIServiceClientType{
         self.authenticationHeader = authenticationHeader
         self.customHandlingStatusCode = customHandlingStatusCode
         
+        NetworkReachabilityHandler.shared.start()
     }
     
     public func getData< S : Codable >(
@@ -44,6 +46,10 @@ public class APIServiceClient : NSObject, APIServiceClientType{
         successResponseModelType : S.Type
         
     ) async throws -> S {
+        
+        if NetworkReachabilityHandler.shared.isNetworkAvailable() == false {
+            throw NetworkHandlerError.noInternetConnection
+        }
         
         do{
             let networkResult = try await networkHandler.requestDataAPI(endpoint: endpoint.getEndpoint())

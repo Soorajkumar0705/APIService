@@ -10,13 +10,21 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "APIService",
-            targets: ["APIService"]),
+            targets: ["APIService"]
+        ),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/Soorajkumar0705/NetworkReachability.git", from: "0.0.1")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "APIService"),
+            name: "APIService",
+            dependencies: [
+                .product(name: "NetworkReachability", package: "NetworkReachability")
+            ]
+        ),
         .testTarget(
             name: "APIServiceTests",
             dependencies: ["APIService"]

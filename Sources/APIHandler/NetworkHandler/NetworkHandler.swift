@@ -32,12 +32,7 @@ class NetworkHandler : NetworkHandlerType {
         endpoint : APIEndpointType
         
     )  async throws -> Data {
-        
-#warning("Fix this")
-//        if NetworkReachability.shared.isNetworkAvailable() == false {
-//            throw NetworkHandlerError.noInternetConnection
-//        }
-        
+
         let req = try requestFactory.getRequest(for: endpoint)
         
         let (data, httpResponse) = try await URLSession.shared.data(for: req)
