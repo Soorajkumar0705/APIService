@@ -1,12 +1,10 @@
 
-# APIService — Swift Networking Layer
+# APIService — Custom Swift Networking Layer Module
 
 A modular, flexible, and lightweight networking layer for Swift/iOS built using async/await.  
 Supports dynamic request bodies, custom headers, endpoint-driven API structure, and centralized error handling.
 
----
-
-## 🚀 Features
+## Features
 
 - Easy API calls using `async/await`
 - Encodable, Data, or Dictionary request bodies
@@ -16,23 +14,30 @@ Supports dynamic request bodies, custom headers, endpoint-driven API structure, 
 - Custom status-code handling
 - Clean and maintainable structure
 
----
+## Installation (SPM)
 
-# 📦 Installation (SPM)
+Add using Swift Package Manager:
 
-Add this package using Swift Package Manager:
-
+```
 https://github.com/Soorajkumar0705/APIService
+```
+
+## Configuration
+Configuration of the api service includes multiple stages.
 
 
----
+### 1. Instantiate APIService 
+> - Intantiate the class using the `APIServiceFactory`.
+> - Create a global Instance of the `APIServiceClientType` protocol Type.
+> - Using the Factory and Builder feed your custom configurations in the `APIServiceClient` class.
+> - The Delegate here Provides a method of callback events when any of the provided `HTTP Status Codes` will be sent from the server.
+> - set Authentication headers are, when you have api to call with the auth, Feed them and it will be automatically be passed in the API Headers.
 
-# ⚙️ Setup — Instantiate APIService
-
+> 💡NOTE: Set the Header Key `"X-Session-Token"` as well as the value `"Session Token Value"` as in the below example.
 
 ```swift
 
-// Declare global instance
+// Declare the global instance In the DI or VM class.
 var apiService : APIServiceClientType!
 
 func instantiateAPIService() {
@@ -41,7 +46,7 @@ func instantiateAPIService() {
         .setAuthenticationHeader([
             .init(
                 field: .init("X-Session-Token"),
-                value: .init("Session")
+                value: .init("Session Token Value")
             )
         ])
         .setCustomHandlingStatusCode([401])
@@ -50,7 +55,7 @@ func instantiateAPIService() {
 
 ```
 
-### What You Can Customize here.
+#### What You Can Customize here.
 
 | Method                                | Purpose                                       |
 | ------------------------------------- | --------------------------------------------- |
@@ -59,6 +64,27 @@ func instantiateAPIService() {
 | `.setCustomHandlingStatusCode([Int])` | Add custom status codes that trigger delegate |
 | `.make()`                             | Build the APIService instance                 |
 
+
+
+##### Custom Handling Status Codes
+
+- In Custom Handling Status Codes, pass those HTTP Status codes which you want a call back event from the APIService class.
+- This call back event feature is mainly designed to handle such scenarios when the `Session Token` or `Refresh Token` gets expired and we have to Navigate or Route the user to Authentication screen.
+- In Such Scenarios Set the Specific HTTP Status codes which are expected from the server, when any of the `Session Token` or `Refresh Token` gets expired.
+- When Any of the code will be recieved from the server it will give the call back event.
+
+
+```swift
+
+extension ViewController : APIServiceDelegate {
+    
+    func didReceiveResponse(with statusCode: Int, data: Data?) {
+        
+    }
+    
+}
+
+```
 
 ---
 
@@ -114,7 +140,7 @@ extension UsersEndpoint: APIEndpointEnumType {
 | `params`     | Request body (Encodable/Data/Dictionary) |
 
 
-### Get API Example 
+## GET API Call
 
 ```swift
 func getData() {
