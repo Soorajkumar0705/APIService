@@ -13,6 +13,9 @@ public protocol NetworkHandlerFactoryType {
     func make() -> NetworkHandlerType
 }
 
+
+public typealias APIResult = (responseData:Data, httpStatusCode:Int)
+
 public protocol NetworkHandlerType {
     
     var requestFactory : RequestBuilderType { get }
@@ -20,5 +23,5 @@ public protocol NetworkHandlerType {
     func requestDataAPI(
         endpoint : APIEndpointType
         
-    )  async throws -> Data
+    )  async throws -> APIResult
 }

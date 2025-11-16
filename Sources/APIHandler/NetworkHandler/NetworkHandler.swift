@@ -31,10 +31,10 @@ class NetworkHandler : NetworkHandlerType {
     func requestDataAPI(
         endpoint : APIEndpointType
         
-    )  async throws -> Data {
+    )  async throws -> APIResult {
 
-        let req = try requestFactory.getRequest(for: endpoint)
-        
+        var req = try requestFactory.getRequest(for: endpoint)
+
         let (data, httpResponse) = try await URLSession.shared.data(for: req)
         
         
@@ -46,7 +46,7 @@ class NetworkHandler : NetworkHandlerType {
         }
         
         if (200...300).contains(httpResponse.statusCode){
-            return data
+            return (responseData: data, httpStatusCode: httpResponse.statusCode)
         }else{
             throw NetworkHandlerError.errorInAPIResponse(errorData: data, statusCode: httpResponse.statusCode)
         }

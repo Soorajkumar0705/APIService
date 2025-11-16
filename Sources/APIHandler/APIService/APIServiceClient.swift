@@ -52,20 +52,25 @@ public class APIServiceClient : NSObject, APIServiceClientType{
         }
         
         do{
-            let networkResult = try await networkHandler.requestDataAPI(endpoint: endpoint.getEndpoint())
+            let networkResult : APIResult = try await networkHandler.requestDataAPI(endpoint: endpoint.getEndpoint())
             
-            
-            
-            
-            return try responseHandler.parseResponseWithJSONDecoder(data: networkResult, modelType: successResponseModelType)
+            if let customHandlingStatusCode, customHandlingStatusCode.contains(networkResult.httpStatusCode),
+               delegate != nil
+            {
+                
+                delegate?.didReceiveResponse(with: networkResult.httpStatusCode, data: networkResult.responseData)
+            }
+
+            return try responseHandler.parseResponseWithJSONDecoder(data: networkResult.responseData, modelType: successResponseModelType)
 
         }catch let error {
             
             if case let error as NetworkHandlerError = error,
-               case let .errorInAPIResponse(errorData: data, statusCode: statusCode) = error
+               case let .errorInAPIResponse(errorData: data, statusCode: statusCode) = error,
+               let customHandlingStatusCode, customHandlingStatusCode.contains(statusCode),
+               delegate != nil
             {
-                #warning("Fix this using builder pattern")
-                
+                delegate?.didReceiveResponse(with: statusCode, data: data)
             }
             
             throw error
