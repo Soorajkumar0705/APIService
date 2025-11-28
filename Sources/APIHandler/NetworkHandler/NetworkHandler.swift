@@ -10,9 +10,18 @@ import Foundation
 
 class NetworkHandlerFactory : NetworkHandlerFactoryType{
     
+    var logger : NetworkLoggerType
+    
+    init(logger: NetworkLoggerType) {
+        self.logger = logger
+    }
+    
     func make() -> NetworkHandlerType {
         NetworkHandler(
-            requestFactory: RequestBuilderFactory().make()
+            logger: logger,
+            requestFactory: RequestBuilderFactory(
+                logger: logger
+            ).make()
         )
     }
     
@@ -20,11 +29,14 @@ class NetworkHandlerFactory : NetworkHandlerFactoryType{
 
 class NetworkHandler : NetworkHandlerType {
     
+    var logger: any NetworkLoggerType
     var requestFactory: RequestBuilderType
     
     init(
+        logger : NetworkLoggerType,
         requestFactory: RequestBuilderType
     ){
+        self.logger = logger
         self.requestFactory = requestFactory
     }
 
@@ -33,13 +45,12 @@ class NetworkHandler : NetworkHandlerType {
         
     )  async throws -> APIResult {
 
-        var req = try requestFactory.getRequest(for: endpoint)
+        let req = try requestFactory.getRequest(for: endpoint)
 
         let (data, httpResponse) = try await URLSession.shared.data(for: req)
         
-        
-        print("URL : ", req.url?.absoluteString as Any)
-        print("URL Response : ", data.toJSON() as Any)
+        logger.log("URL : \(req.url?.absoluteString as Any)")
+        logger.log("URL Response : \(data.toJSON() as Any)")
         
         guard let httpResponse = httpResponse as? HTTPURLResponse else {
             throw NetworkHandlerError.unknownHTTPResponseFormat

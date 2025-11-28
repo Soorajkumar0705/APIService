@@ -15,18 +15,3 @@ public protocol APIEndpointEnumType {
     func getEndpoint() -> APIEndpointType
     
 }
-
-extension APIEndpointEnumType {
-    
-    func getSessionTokenHeader() -> HTTPHeader {
-        let fieldName = "x-session-token"
-        let value = "" // AuthenticationHandler.shared.sessionToken
-#warning("Fix this")
-        
-        return HTTPHeader(
-            field: HTTPHeaderFieldName(fieldName),
-            value: HTTPHeaderFieldValue(value)
-        )
-    }
-    
-}

@@ -11,6 +11,7 @@ import Foundation
 
 public protocol APIServiceClientType: NSObjectProtocol {
     
+    var logger: NetworkLoggerType { get set }
     var networkHandler : NetworkHandlerType { get }
     var responseHandler : ResponseHandlerType { get }
     
@@ -27,5 +28,5 @@ public protocol APIServiceClientType: NSObjectProtocol {
 }
 
 public protocol APIServiceDelegate: AnyObject {
-    func didReceiveResponse(with statusCode : Int, data : Data?)
+    func didReceiveResponse(with statusCode : Int, data : Data?, forEndPoint : APIEndpointEnumType)
 }

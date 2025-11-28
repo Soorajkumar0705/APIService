@@ -10,17 +10,36 @@ import Foundation
 
 class ResponseHandlerFactory{
     
+    var logger : NetworkLoggerType
+    var jsonDecoder : JSONDecoder
+    
+    init(
+        logger: NetworkLoggerType,
+        jsonDecoder : JSONDecoder
+    ) {
+        self.logger = logger
+        self.jsonDecoder = jsonDecoder
+    }
+    
     func make() -> ResponseHandlerType{
-        ResponseHandler(jsonDecoder: JSONDecoder())
+        ResponseHandler(
+            logger: logger,
+            jsonDecoder: jsonDecoder
+        )
     }
     
 }
 
 class ResponseHandler : ResponseHandlerType{
     
+    var logger: any NetworkLoggerType
     var jsonDecoder: JSONDecoder
     
-    init(jsonDecoder: JSONDecoder) {
+    init(
+        logger : any NetworkLoggerType,
+        jsonDecoder: JSONDecoder
+    ) {
+        self.logger = logger
         self.jsonDecoder = jsonDecoder
     }
     
@@ -29,11 +48,7 @@ class ResponseHandler : ResponseHandlerType{
         modelType: T.Type
     ) throws -> T {
         
-        do {
-            return try jsonDecoder.decode(modelType, from: data)
-        } catch{
-            throw ResponseHandlerError.responseTypeIsNotInCodableFormat
-        }
+        return try jsonDecoder.decode(modelType, from: data)
         
     }
     

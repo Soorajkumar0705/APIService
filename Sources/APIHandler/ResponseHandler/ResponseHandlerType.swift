@@ -9,12 +9,19 @@ import Foundation
 
 
 public protocol ResponseHandlerFactoryType {
+    
+    var logger : NetworkLoggerType { get }
+    var jsonDecoder: JSONDecoder { get }
+    
     func make() -> ResponseHandlerType
 }
 
 //MARK: - ResponseHandlerType
 
 public protocol ResponseHandlerType {
+    
+    var logger : NetworkLoggerType { get }
+    var jsonDecoder: JSONDecoder { get }
     
     func parseResponseWithJSONDecoder<T: Codable>(
         data: Data,

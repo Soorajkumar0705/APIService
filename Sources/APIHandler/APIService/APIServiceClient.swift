@@ -13,9 +13,10 @@ import NetworkReachability
 
 public class APIServiceClient : NSObject, APIServiceClientType{
     
+    public var logger: (any NetworkLoggerType)
+    
     public var networkHandler: NetworkHandlerType
     public var responseHandler: ResponseHandlerType
-    
     weak public var delegate: APIServiceDelegate?
 
     
@@ -23,12 +24,15 @@ public class APIServiceClient : NSObject, APIServiceClientType{
     var customHandlingStatusCode : [Int]?
     
     init(
+        logger: (NetworkLoggerType),
         networkHandler : NetworkHandlerType,
         responseHandler : ResponseHandlerType,
         delegate : APIServiceDelegate?,
-        authenticationHeader : [HTTPHeader]? = nil,
-        customHandlingStatusCode : [Int]? = nil
+        authenticationHeader : [HTTPHeader]?,
+        customHandlingStatusCode : [Int]?
     ){
+        
+        self.logger = logger
         self.networkHandler = networkHandler
         self.responseHandler = responseHandler
         
@@ -58,25 +62,31 @@ public class APIServiceClient : NSObject, APIServiceClientType{
                delegate != nil
             {
                 
-                delegate?.didReceiveResponse(with: networkResult.httpStatusCode, data: networkResult.responseData)
+                delegate?.didReceiveResponse(
+                    with: networkResult.httpStatusCode,
+                    data: networkResult.responseData,
+                    forEndPoint: endpoint
+                )
             }
 
             return try responseHandler.parseResponseWithJSONDecoder(data: networkResult.responseData, modelType: successResponseModelType)
 
         }catch let error {
             
+            // Check for the error and the status code to match it with customHandlingCode
+            // and provide a callback
             if case let error as NetworkHandlerError = error,
                case let .errorInAPIResponse(errorData: data, statusCode: statusCode) = error,
                let customHandlingStatusCode, customHandlingStatusCode.contains(statusCode),
                delegate != nil
             {
-                delegate?.didReceiveResponse(with: statusCode, data: data)
+                delegate?.didReceiveResponse(with: statusCode, data: data, forEndPoint : endpoint)
             }
             
             throw error
         }
         
-    }   // func getData<T:ParsableResponseModel>(endpoint : AuthenticationEndPoint
+    }
     
 }
 

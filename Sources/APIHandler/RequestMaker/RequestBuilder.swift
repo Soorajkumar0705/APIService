@@ -10,14 +10,28 @@ import Foundation
 
 class RequestBuilderFactory : RequestBuilderFactoryType{
     
+    public var logger: (any NetworkLoggerType)
+    
+    init(logger: any NetworkLoggerType) {
+        self.logger = logger
+    }
+    
     func make() -> RequestBuilderType {
-        RequestBuilder()
+        RequestBuilder(
+            logger: logger
+        )
     }
     
 }
 
 
 class RequestBuilder : RequestBuilderType{
+    
+    public var logger: (any NetworkLoggerType)
+    
+    init(logger: any NetworkLoggerType) {
+        self.logger = logger
+    }
     
     func getRequest(for endpoint : APIEndpointType) throws -> URLRequest {
         
@@ -29,7 +43,6 @@ class RequestBuilder : RequestBuilderType{
             throw NetworkHandlerError.invalidUrl
         }
         
-        print("URL : ", url.absoluteString)
         
         var request = URLRequest(url: url)
         
@@ -43,7 +56,6 @@ class RequestBuilder : RequestBuilderType{
             }
         }
         
-        
         if let body = endpoint.parameter?.buildBody(){
             request.httpBody = body
         }
@@ -56,7 +68,12 @@ class RequestBuilder : RequestBuilderType{
             request.addValue(header.value.value, forHTTPHeaderField: header.field.value)
         }
         
-        print("URL Request Headers : ", request.allHTTPHeaderFields ?? [:] )
+        logger.log("* ================ * APIService * ================ *")
+        logger.log("URL : \(url.absoluteString)")
+        logger.log("HTTPMethod : \(endpoint.method as Any)")
+        logger.log("HTTP Header fields : \(request.allHTTPHeaderFields ?? [:])")
+        logger.log("EndPoint Configuration : \(endpoint.configurations)")
+        logger.log("HTTPParameter : \(endpoint.parameter as Any)")
         
         return request
     }
