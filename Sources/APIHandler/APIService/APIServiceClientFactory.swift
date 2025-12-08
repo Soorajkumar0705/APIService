@@ -1,5 +1,5 @@
 //
-//  APIServiceFactory.swift
+//  APIServiceClientFactory.swift
 //  APIService
 //
 //  Created by Suraj kahar on 01/03/25.
@@ -8,7 +8,7 @@
 import Foundation
 
 
-public class APIServiceFactory{
+public class APIServiceClientFactory{
     
     var networkHandler: NetworkHandlerType?
     var responseHandler: ResponseHandlerType?
