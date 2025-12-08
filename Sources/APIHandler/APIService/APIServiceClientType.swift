@@ -20,9 +20,21 @@ public protocol APIServiceClientType: NSObjectProtocol {
     
     func getData< S : Codable>(
         endpoint : APIEndpointEnumType,
-        successResponseModelType : S.Type
+        responseType : S.Type
         
     ) async throws -> S
+    
+    func getDataResult< S : Codable>(
+        endpoint : APIEndpointEnumType,
+        responseType : S.Type
+        
+    ) async -> Result<S, Error>
+    
+    func getData< S : Codable>(
+        endpoint : APIEndpointEnumType,
+        responseType : S.Type,
+        completionHandler : @escaping (Result<S, Error>) -> Void
+    ) async
     
 }
 

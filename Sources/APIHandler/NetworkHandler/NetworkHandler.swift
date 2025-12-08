@@ -33,7 +33,7 @@ class NetworkHandler : NetworkHandlerType {
         
     )  async throws -> APIResult {
 
-        var req = try requestFactory.getRequest(for: endpoint)
+        let req = try requestFactory.getRequest(for: endpoint)
 
         let (data, httpResponse) = try await URLSession.shared.data(for: req)
         

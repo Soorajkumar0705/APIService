@@ -41,9 +41,13 @@ public class APIServiceClient : NSObject, APIServiceClientType{
         NetworkReachabilityHandler.shared.start()
     }
     
+}
+
+extension APIServiceClient {
+    
     public func getData< S : Codable >(
         endpoint : APIEndpointEnumType,
-        successResponseModelType : S.Type
+        responseType : S.Type
         
     ) async throws -> S {
         
@@ -61,7 +65,7 @@ public class APIServiceClient : NSObject, APIServiceClientType{
                 delegate?.didReceiveResponse(with: networkResult.httpStatusCode, data: networkResult.responseData)
             }
 
-            return try responseHandler.parseResponseWithJSONDecoder(data: networkResult.responseData, modelType: successResponseModelType)
+            return try responseHandler.parseResponseWithJSONDecoder(data: networkResult.responseData, modelType: responseType)
 
         }catch let error {
             
@@ -76,7 +80,95 @@ public class APIServiceClient : NSObject, APIServiceClientType{
             throw error
         }
         
-    }   // func getData<T:ParsableResponseModel>(endpoint : AuthenticationEndPoint
+    }
     
 }
 
+extension APIServiceClient {
+    
+    public func getDataResult<S: Codable>(
+        endpoint: any APIEndpointEnumType,
+        responseType: S.Type
+        
+    ) async -> Result<S, Error>{
+        
+        if NetworkReachabilityHandler.shared.isNetworkAvailable() == false {
+            return .failure(NetworkHandlerError.noInternetConnection)
+        }
+        
+        do{
+            let networkResult : APIResult = try await networkHandler.requestDataAPI(endpoint: endpoint.getEndpoint())
+            
+            if let customHandlingStatusCode, customHandlingStatusCode.contains(networkResult.httpStatusCode),
+               delegate != nil
+            {
+                
+                delegate?.didReceiveResponse(with: networkResult.httpStatusCode, data: networkResult.responseData)
+            }
+
+            let parsedData = try responseHandler.parseResponseWithJSONDecoder(data: networkResult.responseData, modelType: responseType)
+            
+            return .success(parsedData)
+
+        }catch let error {
+            
+            if case let error as NetworkHandlerError = error,
+               case let .errorInAPIResponse(errorData: data, statusCode: statusCode) = error,
+               let customHandlingStatusCode, customHandlingStatusCode.contains(statusCode),
+               delegate != nil
+            {
+                delegate?.didReceiveResponse(with: statusCode, data: data)
+            }
+            
+            return .failure(error)
+        }
+        
+    }
+    
+}
+
+extension APIServiceClient {
+    
+    public func getData<S : Codable>(
+        endpoint: any APIEndpointEnumType,
+        responseType: S.Type,
+        completionHandler: @escaping (Result<S, any Error>) -> Void
+        
+    ) async {
+        
+        if NetworkReachabilityHandler.shared.isNetworkAvailable() == false {
+            completionHandler(.failure(NetworkHandlerError.noInternetConnection))
+            return
+        }
+        
+        do{
+            let networkResult : APIResult = try await networkHandler.requestDataAPI(endpoint: endpoint.getEndpoint())
+            
+            if let customHandlingStatusCode, customHandlingStatusCode.contains(networkResult.httpStatusCode),
+               delegate != nil
+            {
+                delegate?.didReceiveResponse(with: networkResult.httpStatusCode, data: networkResult.responseData)
+            }
+
+            let parsedData = try responseHandler.parseResponseWithJSONDecoder(data: networkResult.responseData, modelType: responseType)
+            
+            completionHandler(.success(parsedData))
+            
+            return
+
+        }catch let error {
+            
+            if case let error as NetworkHandlerError = error,
+               case let .errorInAPIResponse(errorData: data, statusCode: statusCode) = error,
+               let customHandlingStatusCode, customHandlingStatusCode.contains(statusCode),
+               delegate != nil
+            {
+                delegate?.didReceiveResponse(with: statusCode, data: data)
+            }
+            
+            completionHandler(.failure(error))
+            return
+        }
+        
+    }
+}
